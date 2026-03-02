@@ -32,7 +32,7 @@ class AbstractAdapter(ABC):
             "channel": self.channel,
             "user_id": user_id,
             "text": text,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(datetime.timezone.utc).isoformat(),
             "attachments": attachments or []
         }
 
