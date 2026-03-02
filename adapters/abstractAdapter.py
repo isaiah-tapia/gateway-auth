@@ -35,5 +35,5 @@ class AbstractAdapter(ABC):
             "timestamp": datetime.now(datetime.timezone.utc).isoformat(),
             "attachments": attachments or []
         }
-
+    
 
