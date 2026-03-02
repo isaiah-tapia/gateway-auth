@@ -30,6 +30,7 @@ class Session():
         self.user_id = user_id
         self.channel = channel
         self.connected_at =  datetime.now(timezone.utc).isoformat()
+        # our conenction is reachable from here
         self.websocket: Optional[WebSocket] = None
         self.missed_messages: deque = deque(maxlen=MAX_MISSED)
         self.message_timestamps: deque = deque()
@@ -40,22 +41,29 @@ class SessionStore():
     """
 
     def __init__(self):
-        # maps a user to their session id
+        # maps a session to a session id
         self._sessions: Dict[str, Session] = {}
-        pass
 
-    def create(self, ):
-        pass
+    def create(self, user_id: str, channel: str ):
+        session_id = str(uuid.uuid4())
+        session = Session(session_id=session_id, user_id=user_id, channel=channel)
+        self._sessions[session_id] = session
+        return session
 
-    def get(self):
-        pass
+    def get(self, session_id):
+        session = self._sessions.get(session_id)
+        return session
     
-    def get_session_by_user(self):
-        pass
+    def get_session_by_user(self, user_id):
+        sessions_belonging_to_user = []
+        for _, session in self._sessions.items():
+            if session.user_id == user_id:
+                sessions_belonging_to_user.append(session)
+        return sessions_belonging_to_user
 
-    def attach_websocket(self):
-        pass
+    def attach_websocket(self, session: Session, websocket: WebSocket):
+        session.websocket = websocket
 
-    def detach_websocket(self):
-        pass
+    def detach_websocket(self, session: Session):
+        session.websocket = None
 
