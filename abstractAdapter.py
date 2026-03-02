@@ -3,7 +3,9 @@ import encodings
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-class abstractAdapter():
+class AbstractAdapter(ABC):
+
+    channel: str = "abstract"
 
     @abstractmethod
     def normalize(self, dict):
