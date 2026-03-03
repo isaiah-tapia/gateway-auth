@@ -36,4 +36,3 @@ class AbstractAdapter(ABC):
             "attachments": attachments or []
         }
     
-
