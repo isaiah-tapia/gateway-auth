@@ -13,7 +13,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-SIGNKEY = "foo"
+SIGNKEY = "3hfiojf903nfsjdkand"
 ALGO = "HS256"
 TOKEN_EXPIRY = 15
 RATE_LIMIT_SESSION = 10
@@ -30,8 +30,7 @@ class Session():
         self.user_id = user_id
         self.channel = channel
         self.connected_at =  datetime.now(timezone.utc).isoformat()
-        # our conenction is reachable from here
-        self.websocket: Optional[WebSocket] = None
+        self.websocket: Optional[WebSocket] = None # our conenction is reachable from here
         self.missed_messages: deque = deque(maxlen=MAX_MISSED)
         self.message_timestamps: deque = deque()
 
