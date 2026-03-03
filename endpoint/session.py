@@ -40,7 +40,7 @@ class SessionStore():
     """
 
     def __init__(self):
-        # maps a session to a session id
+        # maps a session id to a session
         self._sessions: Dict[str, Session] = {}
 
     def create(self, user_id: str, channel: str ):

@@ -5,4 +5,7 @@ class WebAdapter(AbstractAdapter):
     """
     Our web adapter should be 
     """
-    pass
+    def __init__(self):
+        super().__init__()
+
+    
