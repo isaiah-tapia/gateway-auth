@@ -46,20 +46,20 @@ async def single_client(name: str, user_id: str, channel: str, message: str):
 
 async def scenario_concurrent_clients():
     print("\n" + "-"*50)
-    print("SCENARIO 1: 3 Concurrent Clients")
+    print("3 Concurrent Clients")
     print("-"*50)
     await asyncio.gather(
         single_client("Web Client",   "user_alice", "web",   "Hi from web app!"),
         single_client("Slack Client", "user_bob",   "slack", "Hi from Slack"),
         single_client("X DM Client",  "user_carol", "x_dm",  "Hi from X DMs"),
     )
-    print("[SCENARIO 1] ✓ Done\n")
+    print("[SCENARIO Concurrent Clients] Done\n")
 
 # Reconnection
 
 async def scenario_reconnection():
     print("\n" + "-"*50)
-    print("SCENARIO 2: Reconnection with Missed Messages")
+    print("Reconnection with Missed Messages")
     print("-"*50)
 
     ws, session_id = await connect("user_dave", "web")
@@ -75,18 +75,18 @@ async def scenario_reconnection():
 
     try:
         missed = json.loads(await asyncio.wait_for(ws.recv(), timeout=3))
-        print(f"[RECONNECT] ↩ Received missed message: {missed}")
+        print(f"[RECONNECT] Receive missed message: {missed}")
     except asyncio.TimeoutError:
-        print(f"[RECONNECT] No missed messages buffered (expected if none were sent while offline)")
+        print(f"[RECONNECT] No missed messages recieved")
 
     await ws.close()
-    print("[SCENARIO 2] ✓ Done\n")
+    print("[Reconnection] Done\n")
 
 # Rate Limiting 
 
 async def scenario_rate_limit():
     print("\n" + "-"*50)
-    print("SCENARIO 3: Rate Limiting (max 10 messages/min)")
+    print("Rate Limiting (max 10 messages/min)")
     print("-"*50)
 
     ws, session_id = await connect("user_eve", "web")
@@ -96,19 +96,19 @@ async def scenario_rate_limit():
         await ws.send(json.dumps({"text": f"message {i+1}"}))
         resp = json.loads(await ws.recv())
         if resp.get("error") == "rate_limited":
-            print(f"[RATE LIMIT] ✗ Rate limited on message {i+1} — working as expected")
+            print(f"[RATE LIMIT] Rate limited on message {i+1} — working as expected")
             break
         else:
-            print(f"[RATE LIMIT] ✓ Message {i+1} delivered")
+            print(f"[RATE LIMIT] Message {i+1} delivered")
 
     await ws.close()
-    print("[SCENARIO 3] ✓ Done\n")
+    print("[Rate Limiting] Done\n")
 
 # Invalid Token 
 
 async def scenario_invalid_token():
     print("\n" + "-"*50)
-    print("SCENARIO 4: Invalid Token Rejection")
+    print("Invalid Token Rejection")
     print("-"*50)
 
     ws = await websockets.connect(WS_URL)
@@ -118,17 +118,17 @@ async def scenario_invalid_token():
         resp = json.loads(await asyncio.wait_for(ws.recv(), timeout=3))
         print(f"[AUTH] Server rejected invalid token: {resp}")
     except websockets.exceptions.ConnectionClosed as e:
-        print(f"[AUTH] ✓ Connection closed with code={e.code} reason={e.reason}")
+        print(f"[AUTH] Connection closed with code={e.code}")
     except asyncio.TimeoutError:
         print(f"[AUTH] Connection timed out (expected)")
 
-    print("[SCENARIO 4] ✓ Done\n")
+    print("[Invalid Token] Done\n")
 
 # Logging 
 
 async def scenario_logging():
     print("\n" + "-"*50)
-    print("SCENARIO 5: Logging Verification")
+    print("Metrics")
     print("-"*50)
     print("[LOGGING] Fetching /metrics endpoint")
 
@@ -140,7 +140,7 @@ async def scenario_logging():
             print(f"  {key}: {value}")
 
     print("[LOGGING] Check server terminal for structured JSON auth + message logs")
-    print("[SCENARIO 5] ✓ Done\n")
+    print("[Metricx] Done\n")
 
 # Main
 
