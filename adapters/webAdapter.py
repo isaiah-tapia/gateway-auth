@@ -17,7 +17,7 @@ class WebAdapter(AbstractAdapter):
             "session_id": session_id,
             "channel": self.channel,
             "user_id": user_id,
-            "text": raw.get("text", ""),
+            "text": self.sanitize(raw.get("text", "")),
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "attachments": raw.get("attachments", [])
         }

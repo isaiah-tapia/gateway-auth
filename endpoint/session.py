@@ -34,6 +34,10 @@ class Session():
         self.missed_messages: deque = deque(maxlen=MAX_MISSED)
         self.message_timestamps: deque = deque()
 
+    @property
+    def is_connected(self) -> bool:
+        return self.websocket is not None
+
     def empty_old_messages(self, current_time):
         size_msg_ts = len(self.message_timestamps)
         if size_msg_ts < 1:

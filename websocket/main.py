@@ -10,6 +10,7 @@ from adapters.xAdapter import XDMAdapter
 from adapters.slackAdapter import SlackAdapter
 from websocket.metrics import Metrics
 import time
+from datetime import datetime, timezone
 
 ADAPTERS = {
     "web": WebAdapter(),
@@ -53,13 +54,18 @@ async def handle_websocket_connections(websocket: WebSocket) -> None:
     This funciton will handle our websocket connections.
     """
     await websocket.accept()
-    data_string = await websocket.receive_text()
+    try:
+        data_string = await asyncio.wait_for(websocket.receive_text(), timeout=10.0)
+    except asyncio.TimeoutError:
+        await websocket.close(code=4008, reason="handshake timeout")
+        return
     data_dict = json.loads(data_string)
     token = data_dict.get("token")
     authenticated_dic = auth_token(token=token)
 
     if authenticated_dic is None:
         metrics.auth_failures += 1
+        logger.info(json.dumps({"event": "rejected", "reason": "invalid_token", "timestamp": datetime.now(timezone.utc).isoformat()}))
         await websocket.close(code=401, reason="unauthorized, token is invalid")
         return
     
@@ -71,10 +77,13 @@ async def handle_websocket_connections(websocket: WebSocket) -> None:
 
     # ensure the validity of our session
     if valid_session and valid_session.user_id == user_id:
+        # Resume our session
         sessionStore.attach_websocket(session=valid_session, websocket=websocket)
+        logger.info(json.dumps({"event": "reconnected", "user_id": user_id, "session_id": valid_session.session_id}))
     else:
         valid_session = sessionStore.create(user_id=user_id, channel=channel)
         sessionStore.attach_websocket(session=valid_session, websocket=websocket)
+        logger.info(json.dumps({"event": "connected", "user_id": user_id, "session_id": valid_session.session_id, "channel": channel}))
 
     # send back to client an acknowledgement, session_id and channel (handshake)
     ack = json.dumps({"ack":1,"session_id":valid_session.session_id,"channel":channel})
@@ -88,6 +97,7 @@ async def handle_websocket_connections(websocket: WebSocket) -> None:
             # check rate limiting
             data = await websocket.receive_text()
             metrics.messages_received += 1
+            logger.info(json.dumps({"event": "received", "session_id": valid_session.session_id, "channel": channel}))
             under_rate_limit = valid_session.is_under_rate_limit()
             if under_rate_limit:
                 adapter = ADAPTERS.get(channel, WebAdapter())
@@ -96,11 +106,17 @@ async def handle_websocket_connections(websocket: WebSocket) -> None:
                 response_text = await orchestrator_stub(unified_schema)
                 latency_ms = (time.time() - start) * 1000
                 metrics.record_latency(latency_ms)
-                await websocket.send_text(json.dumps({"response": response_text}))
-                metrics.messages_delivered += 1
+                # ADD my missed messages
+                if valid_session.is_connected:
+                    await websocket.send_text(json.dumps({"response": response_text}))
+                    logger.info(json.dumps({"event": "delivered", "session_id": valid_session.session_id, "channel": channel}))
+                    metrics.messages_delivered += 1
+                else:
+                    valid_session.missed_messages.append({"response": response_text})
             else:
                 await websocket.send_text(json.dumps({"error": "rate_limited"}))
                 metrics.messages_delivered += 1
                 continue
     except WebSocketDisconnect:
+        logger.info(json.dumps({"event": "disconnected", "session_id": valid_session.session_id}))
         sessionStore.detach_websocket(valid_session)

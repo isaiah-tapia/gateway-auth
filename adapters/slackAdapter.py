@@ -33,7 +33,7 @@ class SlackAdapter(AbstractAdapter):
             "session_id": session_id,
             "channel": self.channel,
             "user_id": slack_user_id,
-            "text": raw.get("text", ""),
+            "text": self.sanitize(raw.get("text", "")),
             "timestamp": timestamp,
             "attachments": attachments,
             # metadata for denormalize

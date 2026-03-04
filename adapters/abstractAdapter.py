@@ -20,6 +20,11 @@ class AbstractAdapter(ABC):
         Denomralize our response and send it back to our client
         """
         pass
+
+    def sanitize(self, text: str) -> str:
+        if not isinstance(text, str):
+            return ""
+        return text.replace("\x00", "").strip()[:2000]
     
     def abs_scheme(self, session_id: str, user_id: str, text: str,
                    attachments: list = None, msg_id: str = None):

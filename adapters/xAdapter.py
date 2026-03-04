@@ -31,7 +31,7 @@ class XDMAdapter(AbstractAdapter):
             "session_id": session_id,
             "channel": self.channel,
             "user_id": participant_id,
-            "text": raw.get("text", ""),
+            "text": self.sanitize(raw.get("text", "")),
             "timestamp": timestamp,
             "attachments": attachments,
             # metadata for denormalize
