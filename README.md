@@ -1,4 +1,4 @@
-# moccet Gateway
+# Gateway
 
 Real-time WebSocket gateway with JWT authentication and multi-channel routing.
 
@@ -6,6 +6,9 @@ Real-time WebSocket gateway with JWT authentication and multi-channel routing.
 
 ```
 gateway-auth/
+├──endpoint/
+│   ├── auth.py          # authenticate / create token
+│   ├── session.py       # instaniate sessions
 ├── websocket/
 │   ├── main.py          # FastAPI app, WebSocket endpoint
 │   ├── session.py       # Session + SessionStore
