@@ -56,3 +56,6 @@ python websocket/demo.py
 | `/auth/token` | POST | Issue a JWT given a user_id |
 | `/ws` | WebSocket | Main gateway connection |
 | `/metrics` | GET | Observability snapshot |
+
+## Video
+<video src="misc/demo_video_gate.mov" controls width="100%"></video>
