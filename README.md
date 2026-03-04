@@ -41,13 +41,13 @@ uvicorn websocket.main:app --port 8000
 python websocket/demo.py
 ```
 
-## Demo Scenarios
+## Scenarios
 
-1. **3 concurrent clients** — web, slack, and x_dm connect simultaneously
-2. **Rate limiting** — session is limited after 10 messages per minute
-3. **Invalid token rejection** — bad JWT is rejected at handshake
-4. **Reconnection** — client disconnects and resumes with same session_id
-5. **Metrics** — live snapshot of connections, messages, latency, auth failures
+1. **concurrent clients** web, slack, and x_dm connect simultaneously
+2. **Rate limiting** session is limited after 10 messages per minute
+3. **Invalid token rejection** bad JWT is rejected at handshake
+4. **Reconnection** client disconnects and resumes with same session_id
+5. **Metrics** live snapshot of connections, messages, latency, auth failures
 
 ## Endpoints
 
