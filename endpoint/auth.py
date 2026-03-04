@@ -1,4 +1,4 @@
-from typing import Optional 
+from typing import Any, Optional 
 from datetime import datetime, timedelta, timezone
 import jwt
 
@@ -11,7 +11,7 @@ two instances of verification.
 """
 
 ALGO = "HS256"
-def create_token(user_id: str):
+def create_token(user_id: str) -> str:
     """
     Our token within this context are our jwt
     user_id: user_id generated prior
@@ -22,10 +22,13 @@ def create_token(user_id: str):
     # token expiry is 15 minutes from instantiation
     payload = {"sub":user_id, "exp": datetime.now(timezone.utc) + timedelta(minutes=TOKEN_EXPIRY), "iat":datetime.now(timezone.utc)}
     token = jwt.encode(payload=payload,algorithm=ALGO, key=SIGNKEY)
-    
+
     return token
 
-def auth_token(token: str):
+def auth_token(token: str) -> None | dict[str, Any]:
+    """
+    Take in and authenticates a token. Returns a dictionary with user_id, expieration and iat.
+    """
     try:
         dic = jwt.decode(jwt=token,key=SIGNKEY,algorithms=[ALGO])
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
