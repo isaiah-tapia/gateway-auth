@@ -1,4 +1,4 @@
-from abstractAdapter import AbstractAdapter
+from adapters.abstractAdapter import AbstractAdapter
 from datetime import datetime, timezone
 import uuid
 

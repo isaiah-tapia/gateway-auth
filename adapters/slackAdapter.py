@@ -1,11 +1,8 @@
 import uuid
 from datetime import datetime, timezone
-from adapters.abstractAdapter import BaseAdapter
+from adapters.abstractAdapter import AbstractAdapter
 
-
-# ─── Slack Adapter ────────────────────────────────────────────────────────────
-
-class SlackAdapter(BaseAdapter):
+class SlackAdapter(AbstractAdapter):
     """
     Slack — messages can belong to threads via thread_ts.
     Incoming: { text, user, thread_ts?, files?, ts }
@@ -21,7 +18,7 @@ class SlackAdapter(BaseAdapter):
         # Convert Slack's unix float string timestamp to ISO
         ts = raw.get("ts")
         if ts:
-            timestamp = datetime.utcfromtimestamp(float(ts)).isoformat()
+            timestamp = datetime.fromtimestamp(float(ts), tz=timezone.utc).isoformat()
         else:
             timestamp = datetime.now(timezone.utc).isoformat()
 
@@ -44,7 +41,7 @@ class SlackAdapter(BaseAdapter):
         }
         return normalized
 
-    def denormalize(self, response: dict) -> dict:
+    def outgoing_denormalize(self, response: dict) -> dict:
         result = {"text": response.get("text", "")}
         # Only include thread_ts if it was in the original message
         thread_ts = response.get("_thread_ts")

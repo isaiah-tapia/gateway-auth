@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime, timezone
-from adapters.abstractAdapter import BaseAdapter
+from adapters.abstractAdapter import AbstractAdapter
 
-class XDMAdapter(BaseAdapter):
+class XDMAdapter(AbstractAdapter):
     """
     X Direct Messages — uses participant_id to identify sender.
     Incoming: { text, participant_id, message_id?, created_timestamp?, attachment_urls? }
@@ -15,10 +15,10 @@ class XDMAdapter(BaseAdapter):
         # X uses participant_id instead of user_id
         participant_id = raw.get("participant_id", user_id)
 
-        # X timestamps are Unix milliseconds
+        # X is unix time https://stackoverflow.com/questions/38546630/how-to-interpret-data-time-in-twitter-dm
         created_ts = raw.get("created_timestamp")
         if created_ts:
-            timestamp = datetime.utcfromtimestamp(int(created_ts) / 1000).isoformat()
+            datetime.fromtimestamp(int(created_ts) / 1000, tz=timezone.utc).isoformat()
         else:
             timestamp = datetime.now(timezone.utc).isoformat()
 
@@ -39,7 +39,7 @@ class XDMAdapter(BaseAdapter):
         }
         return normalized
 
-    def denormalize(self, response: dict) -> dict:
+    def outgoing_denormalize(self, response: dict) -> dict:
         return {
             "text": response.get("text", ""),
             "recipient_id": response.get("_participant_id", "")
