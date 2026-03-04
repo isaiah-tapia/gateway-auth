@@ -29,7 +29,7 @@ class TokenRequest(BaseModel):
 async def orchestrator_stub(message: dict) -> str:
     delay = 2
     await asyncio.sleep(delay)
-    return f"[AI response to: '{message['text'][:10]}']"
+    return f"[AI response to: '{message['text']}']"
 
 @app.get("/metrics")
 def get_metrics():
@@ -59,8 +59,8 @@ async def handle_websocket_connections(websocket: WebSocket) -> None:
     authenticated_dic = auth_token(token=token)
 
     if authenticated_dic is None:
-        await websocket.close(code=401, reason="unauthorized, token is invalid")
         metrics.auth_failures += 1
+        await websocket.close(code=401, reason="unauthorized, token is invalid")
         return
     
     # get our user's key things
@@ -104,10 +104,3 @@ async def handle_websocket_connections(websocket: WebSocket) -> None:
                 continue
     except WebSocketDisconnect:
         sessionStore.detach_websocket(valid_session)
-
-
-# class main():
-#     """
-#     Main is where our websocket server should exist, therefore it is where fastAPI attaches to a session?
-#     """
-#     pass

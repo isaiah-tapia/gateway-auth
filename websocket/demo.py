@@ -6,7 +6,7 @@ Gateway Demo
     4. Invalid token rejection
     5. Logging verification
 Run:
-    1. uvicorn webscoket.main:app --port 8000
+    1. uvicorn websocket.main:app --port 8000
     2. python websocket/demo.py
 """
 
@@ -49,8 +49,8 @@ async def scenario_concurrent_clients():
     print("SCENARIO 1: 3 Concurrent Clients")
     print("-"*50)
     await asyncio.gather(
-        single_client("Web Client",   "user_alice", "web",   "Hello from the web app!"),
-        single_client("Slack Client", "user_bob",   "slack", "Hey from Slack"),
+        single_client("Web Client",   "user_alice", "web",   "Hi from web app!"),
+        single_client("Slack Client", "user_bob",   "slack", "Hi from Slack"),
         single_client("X DM Client",  "user_carol", "x_dm",  "Hi from X DMs"),
     )
     print("[SCENARIO 1] ✓ Done\n")
