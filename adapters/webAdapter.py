@@ -22,5 +22,8 @@ class WebAdapter(AbstractAdapter):
             "attachments": raw.get("attachments", [])
         }
     
-    def outgoing_denormalize(self) -> None:
-        pass
+    def outgoing_denormalize(self, raw: dict) -> dict:
+        return {
+            "text": raw.get("text", ""),
+            "timestamp": raw.get("timestamp", None)
+        }   
